@@ -6,6 +6,9 @@ $num      = isset($_POST['num']) ? $_POST['num'] : "";		//入力された数値�
 $answer   = isset($_POST['answer']) ? $_POST['answer'] : "";  	//計算結果の値が保持される
 $log      = isset($_POST['log']) ? $_POST['log'] : "";		//計算ログが保持される
 $output   = 0;//画面の入力フォームに表示するため変数
+$a      = isset($_POST['a']) ? $_POST['a'] : "";//小数点の有無を確認
+
+//$flag=preg_match("/\./", $answer||$num);
 
 //数字か文字かで判別。is_numericは対象の変数の中身が数値かを判別する。
 if(is_numeric($pushed)){
@@ -21,39 +24,72 @@ if(is_numeric($pushed)){
     }
 
 }else{
-    if($pushed == "C"){$num=$answer=$log=$operator=$pushed=0&&$output=0;
+    
 
 
-
-
-    }else if(is_numeric($num)){//数字が入力済みの時のみ実行
+    if($pushed == "C"){$num=$answer=$log=$operator=$pushed=0&&$output=0;}
+    
+    elseif($pushed=="."){
+        if(empty($a)){
+            
+        $num=$num.".";
+        $output=$answer.$operator.$num;
+        $a=$pushed;
+        }else{
+            $output=$answer.$operator.$mum;
+            
+        }
+    }
+    
+    
+//        $answer=$answer.".".$num;
+//    $output= $answer.$operator;
+//    $num=null;
+          
+    
+    else if(is_numeric($num)){//数字が入力済みの時のみ実行
 
 	//次の条件分岐で$answerが上書きされてしまうのでその前にログに保存
         if($pushed == "＝"){
           $log .=  $answer;
         }
+         //elseif ($operator== "."){
+//                $answer=$answer.$num;
+//                $a=mb_strlen($num);
+//                $s=1;
+//                     for($i=0;$i<$a;$i++){
+//                         $s*=10;
+//                    }
+//               $answer=$answer/$s;
+//               
+//        if( is_float($answer) ) {
+//                    if($operator== "."){
+//                      $operator==null;
+//        }}
+//        }    失敗パターン
+        
 
         //最初に計算記号が出現した『後』、何かしらの文字(=や×、税込みなど)が出現した瞬間に計算を実行。
         //「1+2-」や「1+2=」となった時点で「3-」や「3」といった結果にする。または「1+2税込み」でも3*1.08が実行される
         if($operator == "＋") {
-            $answer = $answer + (int)$num;
+            $answer = $answer + (float)$num;
         } elseif($operator == "－") {
-            $answer = $answer - (int)$num;
+            $answer = $answer - (float)$num;
         } elseif($operator == "×") {
-            $answer = $answer * (int)$num;
-        }
-        
+            $answer = $answer * (float)$num;
+        } 
+
         elseif($operator == "÷") {
             //0で割ることのないように判別
             if($num != 0) {
-                $answer = $answer / (int)$num;
+                $answer = $answer / (float)$num;
             } else {
                 $answer = "error";
             }
         }
         else {
             //計算記号の事前入力なしに「=」や「税込み」などが押された際はここ
-            $answer = (int)$num;
+            $answer = (float)$num;
         }
         
         //記号計算の結果、もしくは素のままの数字に対し最終的なボタン処理を実行
@@ -81,6 +117,7 @@ if(is_numeric($pushed)){
             $operator 	=   $pushed;//押されたボタンの記号を保持。これによりもう一度計算記号が出現したときに計算が実行できる
             $output 	=   $answer.$pushed;
             $num 	=   null;
+            $a="";
         }else{
             $operator   =   null;
             $output     =   $answer;
@@ -136,14 +173,16 @@ if(is_numeric($pushed)){
           <td><button type="submit" name="pushed" value="0" form="calc">0</button></td>
           <td><button type="submit" name="pushed" value="00" form="calc">00</button></td>
           <td><button type="submit" name="pushed" value="÷" form="calc">÷</button></td>
-          <td><button type="submit" name="pushed" value="・" form="calc">・</button></td>
+          <td><button type="submit" name="pushed" value="." form="calc">.</button></td>
           <td><button type="submit" name="pushed" value="＝" form="calc">＝</button></td>
         </tr>
       </table>
-      <input type="hidden" name="num" value="<?php echo $num; ?>">
-      <input  type="hidden" name="operator" value="<?php echo $operator; ?>">
-      <input  type="hidden" name="answer" value="<?php echo $answer; ?>">
-      <input  type="hidden" name="log" value="<?php echo $log; ?>">
+        <input type="hidden" name="num" value="<?php echo $num; ?>">
+        <input  type="hidden" name="operator" value="<?php echo $operator; ?>">
+        <input  type="hidden" name="answer" value="<?php echo $answer; ?>">
+        <input  type="hidden" name="log" value="<?php echo $log; ?>">
+      
+      
     </form>
     <p>計算ログ:</p><br>
     <p><?php echo $log; ?></p>
